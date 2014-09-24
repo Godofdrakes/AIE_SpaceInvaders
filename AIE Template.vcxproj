@@ -90,7 +90,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\Bullet.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\Score.cpp" />
+    <ClCompile Include="source\Ship.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Bullet.h" />
+    <ClInclude Include="include\Score.h" />
+    <ClInclude Include="include\Ship.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
