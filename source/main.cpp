@@ -1,10 +1,11 @@
 ﻿#include "AIE.h"
 #include <iostream>
+#include <array>
 #include "Bullet.h"
 #include "Score.h"
 #include "Ship.h"
 
-
+using namespace std;
 
 
 
@@ -55,7 +56,7 @@ bool doExit = false;
 
 // Function Prototypes
 Ship* CreatePlayer();
-Ship* CreateAliens(unsigned int rows, unsigned int columns);
+Ship* CreateAlien();
 
 
 
@@ -75,8 +76,8 @@ int main( int argc, char* argv[] )
     ALIEN_DIRECTION AlienDirection = RIGHT;
 
     // Pointers for player/aliens
-    Ship *player;
-    Ship *aliens[ENEMY_ROWS*ENEMY_COLUMNS];
+    Ship* player;
+    array<Ship*, (ENEMY_ROWS*ENEMY_COLUMNS)> aliens;
 
     // Create the sprite for the main menu
     int spriteMainMenu = CreateSprite(TEXTURE_START_MENU, WINDOW_W, WINDOW_H, DRAW_FROM_CENTER);
@@ -103,8 +104,13 @@ int main( int argc, char* argv[] )
             player = CreatePlayer();
 
             // Create the Aliens
-            for (unsigned int i = 0; i<ENEMY_ROWS*ENEMY_COLUMNS; ++i) {
-            	aliens[i] = CreateAliens(ENEMY_ROWS, ENEMY_COLUMNS);
+            for(unsigned int r = 0; r<ENEMY_ROWS; ++r) {
+              for(unsigned int c = 0; c<ENEMY_COLUMNS; ++c) {
+                unsigned int i = ( r * ENEMY_COLUMNS ) + c; // Keeps track of which alien we are on. Ranges from 0 to ENEMY_ROWS*ENEMY_COLUMNS
+                aliens[i] = CreateAlien();
+                (*(aliens[i])).y = ( WINDOW_H - ( (*(aliens[i])).h * r+1) - (*(aliens[i])).h ); // Place our aliens from the top of the screen downards
+                (*(aliens[i])).x = (WINDOW_W / (ENEMY_COLUMNS+1) +( WINDOW_W / (ENEMY_COLUMNS+1) * c+1)); //Evenly space the aliens on the x axis
+              }
             }
 
             // And begin the game
@@ -113,16 +119,25 @@ int main( int argc, char* argv[] )
             break;
 
           case PLAY:
+            //Check for player input
+            if( IsKeyDown((*player).keyLeft)) { (*player).MoveX(deltaTime, false); }
+            if( IsKeyDown((*player).keyRight)) { (*player).MoveX(deltaTime, true); }
+            //if( IsKeyDown( (*player).keyShoot ) {}
+
+            for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
+
+            }
+
+            for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
+              MoveSprite((*(aliens[i])).sprite, (*(aliens[i])).x, (*(aliens[i])).y);
+              DrawSprite((*(aliens[i])).sprite);
+            }
 
             MoveSprite((*player).sprite, (*player).x, (*player).y);
             DrawSprite((*player).sprite);
 
-			for (unsigned int i = 0; i<ENEMY_ROWS*ENEMY_COLUMNS; ++i) {
-              MoveSprite((*aliens)[i].sprite, (*aliens)[i].x, (*aliens)[i].y);
-              DrawSprite((*aliens)[i].sprite);
-            }
-
-            if( IsKeyDown( GLFW_KEY_ESCAPE ) ) { GameMode = CLEANUP; }
+            if( IsKeyDown( GLFW_KEY_ESCAPE ) ) { GameMode = CLEANUP; doExit = true; }
+            if( IsKeyDown( GLFW_KEY_TAB ) ) { GameMode = CLEANUP; }
 
             ClearScreen();
             break;
@@ -138,18 +153,23 @@ int main( int argc, char* argv[] )
           case CLEANUP:
             DestroySprite((*player).sprite);
             delete player;
+            cout << player;
 
-			for (unsigned int i = 0; i<ENEMY_ROWS*ENEMY_COLUMNS; ++i) {
-				DestroySprite(*(aliens[i]).sprite);
-				delete aliens[i]; // ---------------------------Work on this
+      			for (unsigned int i = 0; i<ENEMY_ROWS*ENEMY_COLUMNS; ++i) {
+              DestroySprite((*(aliens[i])).sprite);
+      				delete aliens[i];
             }
 
-            GameMode = QUIT;
+            if(doExit) {
+              GameMode = QUIT;
+            } else {
+              GameMode = SETUP;
+            }
+
             ClearScreen();
             break;
 
           case QUIT:
-            doExit = true;
             ClearScreen();
             break;
 
@@ -175,17 +195,17 @@ Ship* CreatePlayer() {
   makePlayer->SetPosMax(WINDOW_W, WINDOW_H);
   makePlayer->SetPos(WINDOW_W / 2.f, 50);
   makePlayer->SetKeys(GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE);
+  makePlayer->SetSpeed(300.f);
 
   return makePlayer;
 }
 
-Ship* CreateAliens(unsigned int rows, unsigned int columns) {
-  Ship* makeAliens = new Ship[(rows*columns)];
-  for(unsigned int i=0; i < rows*columns; ++i) {
-    makeAliens[i].SetSprite(CreateSprite(TEXTURE_SPRITE_ALIEN, 64, 32, DRAW_FROM_CENTER), 64, 32);
-    makeAliens[i].SetPosMax(WINDOW_W, WINDOW_H);
-    makeAliens[i].SetPos(WINDOW_W / 2.f, WINDOW_H - (10*i));
-  }
+Ship* CreateAlien() {
+  Ship* makeAlien = new Ship();
+  makeAlien->SetSprite(CreateSprite(TEXTURE_SPRITE_ALIEN, 64, 32, DRAW_FROM_CENTER), 64, 32);
+  makeAlien->SetPosMax(WINDOW_W, WINDOW_H);
+  makeAlien->SetPos(WINDOW_W / 2.f, WINDOW_H - (10));
+  makeAlien->SetSpeed(300.f);
 
-  return makeAliens;
+  return makeAlien;
 }
