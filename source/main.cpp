@@ -3,7 +3,9 @@
 #include <array>
 #include "Bullet.h"
 #include "Score.h"
+#include "Sprite.h"
 #include "Ship.h"
+#include "Player.h"
 
 using namespace std;
 
@@ -55,7 +57,7 @@ enum ALIEN_DIRECTION {
 bool doExit = false;
 
 // Function Prototypes
-Ship* CreatePlayer();
+Player* CreatePlayer();
 Ship* CreateAlien();
 bool AlienCanMove(array<Ship*, (ENEMY_ROWS*ENEMY_COLUMNS)> &theAliens, bool goRight, float deltaTime);
 
@@ -77,7 +79,7 @@ int main( int argc, char* argv[] )
     ALIEN_DIRECTION AlienDirection = LEFT;
 
     // Pointers for player/aliens
-    Ship* player;
+    Player* player;
     array<Ship*, (ENEMY_ROWS*ENEMY_COLUMNS)> aliens;
 
     // Create the sprite for the main menu
@@ -181,12 +183,9 @@ int main( int argc, char* argv[] )
             break;
 
           case CLEANUP:
-            DestroySprite((*player).sprite);
             delete player;
-            cout << player;
 
       			for (unsigned int i = 0; i<ENEMY_ROWS*ENEMY_COLUMNS; ++i) {
-              DestroySprite((*(aliens[i])).sprite);
       				delete aliens[i];
             }
 
@@ -215,8 +214,8 @@ int main( int argc, char* argv[] )
     return 0;
 }
 
-Ship* CreatePlayer() {
-  Ship* makePlayer = new Ship();
+Player* CreatePlayer() {
+  Player* makePlayer = new Player();
   makePlayer->SetSprite(CreateSprite(TEXTURE_SPRITE_PLAYER, 64, 32, DRAW_FROM_CENTER), 64, 32);
   makePlayer->SetPosMax(WINDOW_W, WINDOW_H);
   makePlayer->SetPos(WINDOW_W / 2.f, 50);
