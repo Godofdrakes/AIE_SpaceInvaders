@@ -30,22 +30,22 @@ void Ship::SetSprite(int set_sprite, int set_w, int set_h) {
 	h = set_h;
 }
 
-void Ship::MoveX(float deltaTime, bool moveRight) {
+void Ship::MoveX(float deltaTime, bool moveRight, float mod) {
 	if(moveRight) {
-		x = x + (speed*deltaTime);
+		x = x + ((speed*mod)*deltaTime);
 	} else {
-		x = x - (speed*deltaTime);
+		x = x - ((speed*mod)*deltaTime);
 	}
 
 	if( x + (w/2) > xMax ) { x = xMax - (w/2); }
 	if( x - (w/2) < 0 ) { x = (w/2); }
 }
 
-void Ship::MoveY(float deltaTime, bool moveUp) {
+void Ship::MoveY(float deltaTime, bool moveUp, float mod) {
 	if(moveUp) {
-		y = y + (speed*deltaTime);
+		y = y + ((speed*mod)*deltaTime);
 	} else {
-		y = y - (speed*deltaTime);
+		y = y - ((speed*mod)*deltaTime);
 	}
 
 	if( y + (w/2) > yMax ) { y = yMax - (w/2); }

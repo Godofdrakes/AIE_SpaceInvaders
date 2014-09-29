@@ -28,8 +28,8 @@ public:
 	void SetSpeed(float set_speed);
 	void SetSprite(int set_sprite, int set_w, int set_h); // Used as func(CreateSprite(), w, h) to hold the sprite's ID and dimentions.
 
-	void MoveX(float deltaTime, bool moveRight); // Use these to move the object
-	void MoveY(float deltaTime, bool moveUp);
+	void MoveX(float deltaTime, bool moveRight, float mod = 1.f); // Use these to move the object
+	void MoveY(float deltaTime, bool moveUp, float mod = 1.f); // Modifier value, if we want it to move faster without changing the speed
 };
 
 #endif

@@ -57,6 +57,7 @@ bool doExit = false;
 // Function Prototypes
 Ship* CreatePlayer();
 Ship* CreateAlien();
+bool AlienCanMove(array<Ship*, (ENEMY_ROWS*ENEMY_COLUMNS)> &theAliens, bool goRight, float deltaTime);
 
 
 
@@ -73,7 +74,7 @@ int main( int argc, char* argv[] )
 
     // Set up the Enmus
     GAME_MODE GameMode = MAINMENU;
-    ALIEN_DIRECTION AlienDirection = RIGHT;
+    ALIEN_DIRECTION AlienDirection = LEFT;
 
     // Pointers for player/aliens
     Ship* player;
@@ -124,9 +125,38 @@ int main( int argc, char* argv[] )
             if( IsKeyDown((*player).keyRight)) { (*player).MoveX(deltaTime, true); }
             //if( IsKeyDown( (*player).keyShoot ) {}
 
-            for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
+            //Check if aliens can move left/right
+            switch(AlienDirection) {
+              case LEFT:
+				  if (AlienCanMove(aliens, false, deltaTime)){ // Check that alien can move left
+                  for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
+                    (*(aliens[i])).MoveX(deltaTime, false); // If yes, move everything left
+                  }
+                } else {
+                  for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
+                    (*(aliens[i])).MoveY(deltaTime, false, 15.f); // If ANY alien can't move left move down that set direction to right
+                    AlienDirection = RIGHT;
+                  }
+                }
 
+                break;
+
+              case RIGHT:
+				  if (AlienCanMove(aliens, true, deltaTime)){ // Check that alien can move right
+                  for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
+                    (*(aliens[i])).MoveX(deltaTime, true); // If yes, move everything right
+                  }
+                } else {
+                  for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
+                    (*(aliens[i])).MoveY(deltaTime, false, 15.f); // If ANY alien can't move right move down that set direction to left
+                    AlienDirection = LEFT;
+                  }
+                }
+
+                break;
             }
+
+            //Move left/right if possible
 
             for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
               MoveSprite((*(aliens[i])).sprite, (*(aliens[i])).x, (*(aliens[i])).y);
@@ -136,7 +166,7 @@ int main( int argc, char* argv[] )
             MoveSprite((*player).sprite, (*player).x, (*player).y);
             DrawSprite((*player).sprite);
 
-            if( IsKeyDown( GLFW_KEY_ESCAPE ) ) { GameMode = CLEANUP; doExit = true; }
+            if( IsKeyDown( GLFW_KEY_ESCAPE ) ) { GameMode = CLEANUP; }
             if( IsKeyDown( GLFW_KEY_TAB ) ) { GameMode = CLEANUP; }
 
             ClearScreen();
@@ -160,11 +190,7 @@ int main( int argc, char* argv[] )
       				delete aliens[i];
             }
 
-            if(doExit) {
-              GameMode = QUIT;
-            } else {
-              GameMode = SETUP;
-            }
+            doExit = true;
 
             ClearScreen();
             break;
@@ -205,7 +231,19 @@ Ship* CreateAlien() {
   makeAlien->SetSprite(CreateSprite(TEXTURE_SPRITE_ALIEN, 64, 32, DRAW_FROM_CENTER), 64, 32);
   makeAlien->SetPosMax(WINDOW_W, WINDOW_H);
   makeAlien->SetPos(WINDOW_W / 2.f, WINDOW_H - (10));
-  makeAlien->SetSpeed(300.f);
+  makeAlien->SetSpeed(150.f);
 
   return makeAlien;
+}
+
+bool AlienCanMove(array<Ship*, (ENEMY_ROWS*ENEMY_COLUMNS)> &theAliens, bool goRight, float deltaTime) {
+  bool canMove = true; // Assume the aliens can move
+  for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) { // Check if each alien can move
+    if(canMove && goRight) { // If one of the previous checks already returned false then we're done here
+		if ((*(theAliens[i])).x + ((*(theAliens[i])).w / 2) + ((*(theAliens[i])).speed*deltaTime) > (*(theAliens[i])).xMax) { canMove = false; } // If moving would go over the max then we can't move that way
+    } else if (canMove && !goRight) {
+		if ((*(theAliens[i])).x - ((*(theAliens[i])).w / 2) - ((*(theAliens[i])).speed*deltaTime) < 0) { canMove = false; } // If moving would go under the min then we can't move that way
+    }
+  }
+  return canMove;
 }
