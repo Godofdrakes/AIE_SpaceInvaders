@@ -3,12 +3,15 @@
 
 Sprite::Sprite(void) {}
 
-Sprite::~Sprite(void) {
-	if(sprite) { DestroySprite(sprite); }
-}
+Sprite::~Sprite(void) {}
 
-void Sprite::SetSprite(int set_sprite, int set_w, int set_h) {
-	sprite = set_sprite;
+void Sprite::SetSprite(const char* SET_SPRITE, int set_w, int set_h) {
 	w = set_w;
 	h = set_h;
+	sprite = CreateSprite(SET_SPRITE, w, h, true);
+}
+
+void Sprite::Draw() {
+	MoveSprite(sprite, x, y);
+	DrawSprite(sprite);
 }

@@ -6,12 +6,14 @@ private:
 protected:
 public:
 	float x, y;
-	int w, h, sprite;
+	int w, h;
+	unsigned sprite;
 
 	Sprite(void);
 	~Sprite(void);
 
-	void SetSprite(int set_sprite, int set_w, int set_h); // Used as func(CreateSprite(), w, h) to hold the sprite's ID and dimentions.
+	void SetSprite(const char* set_sprite, int set_w, int set_h); // Used as func(CreateSprite(), w, h) to hold the sprite's ID and dimentions.
+	void Draw();
 };
 
 #endif

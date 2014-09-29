@@ -93,6 +93,8 @@ int main( int argc, char* argv[] )
         deltaTime = GetDeltaTime();
         SetFont(CHARS_GAME_FONT);
 
+        unsigned int numAliensDead = 0;
+
         switch(GameMode) {
           case MAINMENU:
             MoveSprite(spriteMainMenu, WINDOW_W / 2.f, WINDOW_H / 2.0f);
@@ -124,16 +126,18 @@ int main( int argc, char* argv[] )
 
           case PLAY:
             //Check for player input
-            if( IsKeyDown(player->keyLeft)) { player->MoveX(deltaTime, false); }
-            if( IsKeyDown(player->keyRight)) { player->MoveX(deltaTime, true); }
-            //if( IsKeyDown( player->keyShoot ) {}
+            //if( IsKeyDown(player->keyLeft)) { player->MoveX(deltaTime, false); }
+            //if( IsKeyDown(player->keyRight)) { player->MoveX(deltaTime, true); }
+            player->Move(deltaTime);
+            player->Shoot();
+            player->UpdateBullets(deltaTime);
 
             //Check if aliens can move left/right
             switch(AlienDirection) {
               case LEFT:
                 if (AlienCanMove(aliens, false, deltaTime)){ // Check that alien can move left
                   for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
-                    aliens[i]->MoveX(deltaTime, false); // If yes, move everything left
+                    aliens[i]->MoveX(deltaTime, false, 1.f+numAliensDead); // If yes, move everything left. Faster for each dead alien
                   }
                 } else {
                   for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
@@ -147,7 +151,7 @@ int main( int argc, char* argv[] )
               case RIGHT:
                 if (AlienCanMove(aliens, true, deltaTime)){ // Check that alien can move right
                   for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
-                    aliens[i]->MoveX(deltaTime, true); // If yes, move everything right
+                    aliens[i]->MoveX(deltaTime, true, 1.f+numAliensDead); // If yes, move everything right. Faster for each dead alien
                   }
                 } else {
                   for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
@@ -161,13 +165,9 @@ int main( int argc, char* argv[] )
 
             //Move left/right if possible
 
-            for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
-              MoveSprite(aliens[i]->sprite, aliens[i]->x, aliens[i]->y);
-              DrawSprite(aliens[i]->sprite);
-            }
+            for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) { aliens[i]->Draw(); }
 
-            MoveSprite(player->sprite, player->x, player->y);
-            DrawSprite(player->sprite);
+            player->Draw();
 
             if( IsKeyDown( GLFW_KEY_ESCAPE ) ) { GameMode = CLEANUP; }
             if( IsKeyDown( GLFW_KEY_TAB ) ) { GameMode = CLEANUP; }
@@ -184,10 +184,12 @@ int main( int argc, char* argv[] )
             break;
 
           case CLEANUP:
+            DestroySprite(player->sprite);
             delete player;
 
-      			for (unsigned int i = 0; i<ENEMY_ROWS*ENEMY_COLUMNS; ++i) {
-      				delete aliens[i];
+            for (unsigned int i=0; i<ENEMY_ROWS*ENEMY_COLUMNS; ++i) {
+              DestroySprite(aliens[i]->sprite);
+              delete aliens[i];
             }
 
             doExit = true;
@@ -217,7 +219,7 @@ int main( int argc, char* argv[] )
 
 Player* CreatePlayer() {
   Player* makePlayer = new Player();
-  makePlayer->SetSprite(CreateSprite(TEXTURE_SPRITE_PLAYER, 64, 32, DRAW_FROM_CENTER), 64, 32);
+  makePlayer->SetSprite(TEXTURE_SPRITE_PLAYER, 64, 32);
   makePlayer->SetPosMax(WINDOW_W, WINDOW_H);
   makePlayer->SetPos(WINDOW_W / 2.f, 50);
   makePlayer->SetKeys(GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE);
@@ -228,7 +230,7 @@ Player* CreatePlayer() {
 
 Ship* CreateAlien() {
   Ship* makeAlien = new Ship();
-  makeAlien->SetSprite(CreateSprite(TEXTURE_SPRITE_ALIEN, 64, 32, DRAW_FROM_CENTER), 64, 32);
+  makeAlien->SetSprite(TEXTURE_SPRITE_ALIEN, 64, 32);
   makeAlien->SetPosMax(WINDOW_W, WINDOW_H);
   makeAlien->SetPos(WINDOW_W / 2.f, WINDOW_H - (10));
   makeAlien->SetSpeed(150.f);
