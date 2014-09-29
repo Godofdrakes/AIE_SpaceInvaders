@@ -6,6 +6,7 @@
 #include "Sprite.h"
 #include "Ship.h"
 #include "Player.h"
+#include "Bullet.h"
 
 using namespace std;
 
@@ -111,8 +112,8 @@ int main( int argc, char* argv[] )
               for(unsigned int c = 0; c<ENEMY_COLUMNS; ++c) {
                 unsigned int i = ( r * ENEMY_COLUMNS ) + c; // Keeps track of which alien we are on. Ranges from 0 to ENEMY_ROWS*ENEMY_COLUMNS
                 aliens[i] = CreateAlien();
-                (*(aliens[i])).y = ( WINDOW_H - ( (*(aliens[i])).h * r+1) - (*(aliens[i])).h ); // Place our aliens from the top of the screen downards
-                (*(aliens[i])).x = (WINDOW_W / (ENEMY_COLUMNS+1) +( WINDOW_W / (ENEMY_COLUMNS+1) * c+1)); //Evenly space the aliens on the x axis
+                aliens[i]->y = ( WINDOW_H - ( aliens[i]->h * r+1) - aliens[i]->h ); // Place our aliens from the top of the screen downards
+                aliens[i]->x = ( WINDOW_W / (ENEMY_COLUMNS+1) + ( WINDOW_W / (ENEMY_COLUMNS+1) * c+1)); //Evenly space the aliens on the x axis
               }
             }
 
@@ -123,20 +124,20 @@ int main( int argc, char* argv[] )
 
           case PLAY:
             //Check for player input
-            if( IsKeyDown((*player).keyLeft)) { (*player).MoveX(deltaTime, false); }
-            if( IsKeyDown((*player).keyRight)) { (*player).MoveX(deltaTime, true); }
-            //if( IsKeyDown( (*player).keyShoot ) {}
+            if( IsKeyDown(player->keyLeft)) { player->MoveX(deltaTime, false); }
+            if( IsKeyDown(player->keyRight)) { player->MoveX(deltaTime, true); }
+            //if( IsKeyDown( player->keyShoot ) {}
 
             //Check if aliens can move left/right
             switch(AlienDirection) {
               case LEFT:
                 if (AlienCanMove(aliens, false, deltaTime)){ // Check that alien can move left
                   for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
-                    (*(aliens[i])).MoveX(deltaTime, false); // If yes, move everything left
+                    aliens[i]->MoveX(deltaTime, false); // If yes, move everything left
                   }
                 } else {
                   for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
-                    (*(aliens[i])).MoveY(deltaTime, false, 15.f); // If ANY alien can't move left move down then set direction to right
+                    aliens[i]->MoveY(deltaTime, false, 15.f); // If ANY alien can't move left move down then set direction to right
                     AlienDirection = RIGHT;
                   }
                 }
@@ -146,11 +147,11 @@ int main( int argc, char* argv[] )
               case RIGHT:
                 if (AlienCanMove(aliens, true, deltaTime)){ // Check that alien can move right
                   for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
-                    (*(aliens[i])).MoveX(deltaTime, true); // If yes, move everything right
+                    aliens[i]->MoveX(deltaTime, true); // If yes, move everything right
                   }
                 } else {
                   for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
-                    (*(aliens[i])).MoveY(deltaTime, false, 15.f); // If ANY alien can't move right move down then set direction to left
+                    aliens[i]->MoveY(deltaTime, false, 15.f); // If ANY alien can't move right move down then set direction to left
                     AlienDirection = LEFT;
                   }
                 }
@@ -161,12 +162,12 @@ int main( int argc, char* argv[] )
             //Move left/right if possible
 
             for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
-              MoveSprite((*(aliens[i])).sprite, (*(aliens[i])).x, (*(aliens[i])).y);
-              DrawSprite((*(aliens[i])).sprite);
+              MoveSprite(aliens[i]->sprite, aliens[i]->x, aliens[i]->y);
+              DrawSprite(aliens[i]->sprite);
             }
 
-            MoveSprite((*player).sprite, (*player).x, (*player).y);
-            DrawSprite((*player).sprite);
+            MoveSprite(player->sprite, player->x, player->y);
+            DrawSprite(player->sprite);
 
             if( IsKeyDown( GLFW_KEY_ESCAPE ) ) { GameMode = CLEANUP; }
             if( IsKeyDown( GLFW_KEY_TAB ) ) { GameMode = CLEANUP; }
@@ -239,9 +240,9 @@ bool AlienCanMove(array<Ship*, (ENEMY_ROWS*ENEMY_COLUMNS)> &theAliens, bool goRi
   bool canMove = true; // Assume the aliens can move
   for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) { // Check if each alien can move
     if(canMove && goRight) { // If one of the previous checks already returned false then we're done here
-      if ((*(theAliens[i])).x + ((*(theAliens[i])).w / 2) + ((*(theAliens[i])).speed*deltaTime) > (*(theAliens[i])).xMax) { canMove = false; } // If moving would go over the max then we can't move that way
+      if (theAliens[i]->x + (theAliens[i]->w / 2) + (theAliens[i]->speed*deltaTime) > theAliens[i]->xMax) { canMove = false; } // If moving would go over the max then we can't move that way
     } else if (canMove && !goRight) {
-      if ((*(theAliens[i])).x - ((*(theAliens[i])).w / 2) - ((*(theAliens[i])).speed*deltaTime) < 0) { canMove = false; } // If moving would go under the min then we can't move that way
+      if (theAliens[i]->x - (theAliens[i]->w / 2) - (theAliens[i]->speed*deltaTime) < 0) { canMove = false; } // If moving would go under the min then we can't move that way
     }
   }
   return canMove;
