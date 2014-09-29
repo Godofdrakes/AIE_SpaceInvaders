@@ -128,13 +128,13 @@ int main( int argc, char* argv[] )
             //Check if aliens can move left/right
             switch(AlienDirection) {
               case LEFT:
-				  if (AlienCanMove(aliens, false, deltaTime)){ // Check that alien can move left
+                if (AlienCanMove(aliens, false, deltaTime)){ // Check that alien can move left
                   for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
                     (*(aliens[i])).MoveX(deltaTime, false); // If yes, move everything left
                   }
                 } else {
                   for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
-                    (*(aliens[i])).MoveY(deltaTime, false, 15.f); // If ANY alien can't move left move down that set direction to right
+                    (*(aliens[i])).MoveY(deltaTime, false, 15.f); // If ANY alien can't move left move down then set direction to right
                     AlienDirection = RIGHT;
                   }
                 }
@@ -142,13 +142,13 @@ int main( int argc, char* argv[] )
                 break;
 
               case RIGHT:
-				  if (AlienCanMove(aliens, true, deltaTime)){ // Check that alien can move right
+                if (AlienCanMove(aliens, true, deltaTime)){ // Check that alien can move right
                   for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
                     (*(aliens[i])).MoveX(deltaTime, true); // If yes, move everything right
                   }
                 } else {
                   for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) {
-                    (*(aliens[i])).MoveY(deltaTime, false, 15.f); // If ANY alien can't move right move down that set direction to left
+                    (*(aliens[i])).MoveY(deltaTime, false, 15.f); // If ANY alien can't move right move down then set direction to left
                     AlienDirection = LEFT;
                   }
                 }
@@ -240,9 +240,9 @@ bool AlienCanMove(array<Ship*, (ENEMY_ROWS*ENEMY_COLUMNS)> &theAliens, bool goRi
   bool canMove = true; // Assume the aliens can move
   for(unsigned int i=0; i<ENEMY_COLUMNS*ENEMY_ROWS; ++i) { // Check if each alien can move
     if(canMove && goRight) { // If one of the previous checks already returned false then we're done here
-		if ((*(theAliens[i])).x + ((*(theAliens[i])).w / 2) + ((*(theAliens[i])).speed*deltaTime) > (*(theAliens[i])).xMax) { canMove = false; } // If moving would go over the max then we can't move that way
+      if ((*(theAliens[i])).x + ((*(theAliens[i])).w / 2) + ((*(theAliens[i])).speed*deltaTime) > (*(theAliens[i])).xMax) { canMove = false; } // If moving would go over the max then we can't move that way
     } else if (canMove && !goRight) {
-		if ((*(theAliens[i])).x - ((*(theAliens[i])).w / 2) - ((*(theAliens[i])).speed*deltaTime) < 0) { canMove = false; } // If moving would go under the min then we can't move that way
+      if ((*(theAliens[i])).x - ((*(theAliens[i])).w / 2) - ((*(theAliens[i])).speed*deltaTime) < 0) { canMove = false; } // If moving would go under the min then we can't move that way
     }
   }
   return canMove;
