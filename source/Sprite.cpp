@@ -1,5 +1,4 @@
 #include "Sprite.h"
-#include "AIE.h"
 
 Sprite::Sprite(void) {}
 
@@ -12,6 +11,6 @@ void Sprite::SetSprite(const char* SET_SPRITE, int set_w, int set_h) {
 }
 
 void Sprite::Draw() {
-	MoveSprite(sprite, x, y);
+	MoveSprite(sprite, x, y); //-------------------------
 	DrawSprite(sprite);
 }

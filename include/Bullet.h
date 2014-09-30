@@ -2,7 +2,6 @@
 #define _BULLET_H_
 
 #include "Sprite.h"
-const char* TEXTURE_SPRITE_BULLET = "./images/cannon.png";
 
 class Bullet : public Sprite {
 private:

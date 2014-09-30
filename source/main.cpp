@@ -31,6 +31,7 @@ char* charsCredits = "99";
 // Sprite Textures
 const char* TEXTURE_START_MENU = "./images/Space-Invaders-Marquee.png";
 const char* TEXTURE_SPRITE_PLAYER = "./images/cannon.png";
+const char* TEXTURE_SPRITE_BULLET = "./images/cannon.png";
 const char* TEXTURE_SPRITE_ALIEN = "./images/invaders/invaders_1_00.png";
 const bool DRAW_FROM_CENTER = true;
 

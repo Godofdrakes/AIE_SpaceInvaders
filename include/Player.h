@@ -3,6 +3,7 @@
 
 #include "Ship.h"
 #include "Bullet.h"
+#include "AIE.h"
 const int MAX_BULLETS = 20;
 
 class Player : public Ship {

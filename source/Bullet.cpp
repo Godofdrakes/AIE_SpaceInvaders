@@ -14,5 +14,5 @@ void Bullet::Init(float set_x, float set_y, float set_speedX, float set_speedY, 
 	this->y = set_y;
 	this->speedX = set_speedX;
 	this->speedY = set_speedY;
-	this->SetSprite(SET_SPRITE, set_x, set_y);
+	this->SetSprite(SET_SPRITE, set_w, set_h);
 }

@@ -1,5 +1,5 @@
 #include "Player.h"
-#include "AIE.h"
+extern const char* TEXTURE_SPRITE_BULLET;
 
 Player::Player(void) {}
 
